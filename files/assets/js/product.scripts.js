@@ -1,12 +1,11 @@
 $(document).ready(function(){
 
-  $.ajax({
+    $.ajax({
     url:'http://localhost:3000/api/products/findAll',
     type:'get',
     dataType:'JSON'
   })
   .done(function(response){
-    // console.log(">>", response);
     let data = response.data;
     let status = response.status
     
@@ -14,9 +13,11 @@ $(document).ready(function(){
         createTbody(data);
     } else {
         alert(false,'Πρόβλημα στην αναζήτηση των προϊόντων ('+ data.message + ')');
-        // console.log(data);
     }
   });
+
+
+
 
   $('.row').off('click', '.btnSubmit').on('click', '.btnSubmit', function () {
 
@@ -67,15 +68,13 @@ function createTbody(data){
 
   $("#productTable > tbody").empty();
 
-  // console.log("CreateTBody", data);
   const len = data.length;
   for (let i=0; i<len; i++){
     let product = data[i].product;
     let description = data[i].description;
     let quantity = data[i].quantity;
-    let cost = data[i].cost;
-    
-    // console.log(product, name);
+    let cost = data[i].cost;  
+
 
     let tr_str = "<tr>" +
       "<td>" + product + "</td>" +
@@ -89,8 +88,15 @@ function createTbody(data){
       "</tr>";
 
     $("#productTable tbody").append(tr_str);
-  }
-}
+    
+$('.btnDelete').on('click', function() {
+  let product = $(this).val();
+  deleteData(product);
+});
+
+
+
+}}
 
 function alert(status, message){
   if (status){
@@ -102,3 +108,71 @@ function alert(status, message){
   }
   $('.alert').html(message);
 }
+
+
+
+// function deleteData(product) {
+//   $.ajax({
+//     url: `http://localhost:3000/api/products/delete/${product}`,
+//     type: 'DELETE',
+//     success: function(response) {
+//       console.log(response);
+//       // Refresh the product list
+//       $.ajax({
+//         url: 'http://localhost:3000/api/products/findAll',
+//         type: 'GET',
+//         dataType: 'json',
+//         success: function(response) {
+//           let data = response.data;
+//           createTbody(data);
+//         },
+//         error: function(jqXHR, textStatus, errorThrown) {
+//           console.log(textStatus, errorThrown);
+//         }
+//       });
+//     },
+//     error: function(jqXHR, textStatus, errorThrown) {
+//       console.log(textStatus, errorThrown);
+//     }
+//   });
+// }
+
+function deleteData(product) {
+  $.ajax({
+    url: `http://localhost:3000/api/products/delete/${product}`,
+    type: 'delete',
+    dataType: 'JSON'
+  })
+  .done(function(response){
+    let data = response.data;
+    let status = response.status;
+
+    if (status) {
+      alert(true, 'Επιτυχία στην διαγραφή προιόντων');
+      // Call the findAll function to refresh the product list
+      findAll();
+    } else {
+      alert(false, 'Πρόβλημα στη διαγραφή του προϊόντος (' + data.message + ')');
+    }
+  });
+}
+
+
+function findAll(){
+      $.ajax({
+    url:'http://localhost:3000/api/products/findAll',
+    type:'get',
+    dataType:'JSON'
+  })
+  .done(function(response){
+    let data = response.data;
+    let status = response.status
+    
+    if (status) { 
+        createTbody(data);
+    } else {
+        alert(false,'Πρόβλημα στην αναζήτηση των προϊόντων ('+ data.message + ')');
+    }
+  });
+}
+
